@@ -11,6 +11,7 @@ function Results() {
   const [results, setResults] = useState([]);
   const [jobTitle, setJobTitle] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -24,20 +25,27 @@ function Results() {
         setResults(response.data.candidates);
         setJobTitle(response.data.job_title);
 
-      } catch (error) {
-        console.error(error);
-        alert("Results load nahi ho sake.");
-      } finally {
+     } catch (error) {
+  console.error(error);
+
+  setError(
+    error.response?.data?.error ||
+    "Results load nahi ho sake. Please try again."
+  );
+} finally {
         setLoading(false);
       }
     };
-
-    if (sessionId) {
-      fetchResults();
-    }
+if (sessionId) {
+  fetchResults();
+} else {
+  setError("Screening session not found.");
+  setLoading(false);
+}
   }, [sessionId]);
 
   if (loading) {
+
     return (
       <div style={styles.loadingPage}>
         <div style={styles.loadingCard}>
@@ -50,6 +58,24 @@ function Results() {
       </div>
     );
   }
+  if (error) {
+  return (
+    <div style={styles.loadingPage}>
+      <div style={styles.loadingCard}>
+        <h2>Something went wrong</h2>
+
+        <p>{error}</p>
+
+        <button
+          onClick={() => navigate("/")}
+          style={styles.newButton}
+        >
+          Go to New Screening
+        </button>
+      </div>
+    </div>
+  );
+}
 
   const shortlistedCount = results.filter(
     (candidate) => candidate.shortlisted

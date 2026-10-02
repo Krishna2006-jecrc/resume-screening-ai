@@ -5,21 +5,32 @@ import api from "../../services/api";
 function UploadResumes() {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const { sessionId } = useParams();
   const navigate = useNavigate();
+const handleFileChange = (e) => {
+  const selectedFiles = Array.from(e.target.files);
 
-  const handleFileChange = (e) => {
-    const selectedFiles = Array.from(e.target.files);
+  const invalidFiles = selectedFiles.filter(
+    (file) => file.type !== "application/pdf"
+  );
 
-    setFiles((previousFiles) => [
-      ...previousFiles,
-      ...selectedFiles,
-    ]);
-
-    // Same file ko dobara select karne ki permission
+  if (invalidFiles.length > 0) {
+    setError("Only PDF resume files are allowed.");
     e.target.value = "";
-  };
+    return;
+  }
+
+  setError("");
+
+  setFiles((previousFiles) => [
+    ...previousFiles,
+    ...selectedFiles,
+  ]);
+
+  e.target.value = "";
+};
 
   const removeFile = (indexToRemove) => {
     setFiles((previousFiles) =>
@@ -40,10 +51,12 @@ function UploadResumes() {
   const handleUpload = async (e) => {
     e.preventDefault();
 
-    if (files.length === 0) {
-      alert("Please select at least one PDF resume.");
-      return;
-    }
+   if (files.length === 0) {
+  setError("Please select at least one PDF resume.");
+  return;
+}
+
+setError("");
 
     const formData = new FormData();
 
@@ -72,8 +85,10 @@ function UploadResumes() {
           error.response.data
         );
       }
-
-      alert("Resume upload nahi ho saka.");
+      setError(
+  error.response?.data?.error ||
+  "Resume screening failed. Please try again."
+);
 
     } finally {
       setLoading(false);
@@ -214,7 +229,11 @@ function UploadResumes() {
             </div>
 
           )}
-
+  {error && (
+  <div style={styles.errorBox}>
+    {error}
+  </div>
+)}
 
           {/* Upload Button */}
 
@@ -457,7 +476,15 @@ const styles = {
     fontWeight: "bold",
     flexShrink: 0,
   },
-
+errorBox: {
+  marginTop: "20px",
+  padding: "12px 15px",
+  borderRadius: "8px",
+  backgroundColor: "#fee2e2",
+  color: "#991b1b",
+  fontSize: "14px",
+  textAlign: "center",
+},
   screenButton: {
     width: "100%",
     marginTop: "30px",

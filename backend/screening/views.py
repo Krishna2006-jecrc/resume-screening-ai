@@ -66,13 +66,26 @@ class ResumeViewSet(viewsets.ModelViewSet):
         cleaned_jd = resume.screening_session.job_description.cleaned_description
 
         if cleaned_jd and cleaned_text:
-            score = calculate_similarity(cleaned_jd, cleaned_text)
-            match_score = round(score * 100, 2)
-            ScreeningResult.objects.create(
-                resume=resume,
-                match_score=match_score,
-            )
-            
+            matched_skills, missing_skills = compare_skills(
+            cleaned_jd,
+            cleaned_text
+        )
+
+        match_score = calculate_final_score(
+            cleaned_jd,
+            cleaned_text
+        )
+
+        shortlisted = match_score >= 60
+
+        ScreeningResult.objects.create(
+            resume=resume,
+            match_score=match_score,
+            matched_skills=matched_skills,
+            missing_skills=missing_skills,
+            shortlisted=shortlisted
+        )
+                
             
 class StartScreeningView(APIView):
     
@@ -123,6 +136,7 @@ class BulkResumeUploadView(APIView):
             )
 
         files = request.FILES.getlist("resumes")
+
 
         if not files:
             return Response(
@@ -203,8 +217,9 @@ class BulkResumeUploadView(APIView):
                     "candidate_name": resume.candidate_name,
                     "match_score": match_score
                 })
-
             except Exception as error:
+       
+
                 errors.append({
                     "file": file.name,
                     "error": str(error)
