@@ -19,12 +19,10 @@ function StartScreening() {
 
     try {
       setLoading(true);
-
-      const response = await api.post("start-screening/", {
-        title: title,
-        description: description,
-      });
-
+const response = await api.post("api/start-screening/", {
+    title: title,
+    description: description,
+});
       console.log(response.data);
 
       const sessionId = response.data.screening_session_id;
