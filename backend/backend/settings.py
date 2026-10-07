@@ -134,3 +134,9 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
+CORS_ALLOW_ALL_ORIGINS = True
+
+# Safe side ke liye headers bhi allow kar do
+CORS_ALLOW_HEADERS = [
+    "*",
+]
