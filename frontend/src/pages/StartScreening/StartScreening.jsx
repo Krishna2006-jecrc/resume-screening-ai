@@ -19,7 +19,7 @@ function StartScreening() {
 
     try {
       setLoading(true);
-const response = await api.post("api/start-screening/", {
+const response = await api.post("start-screening/", {
     title: title,
     description: description,
 });
