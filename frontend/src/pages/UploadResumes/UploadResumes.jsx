@@ -68,7 +68,7 @@ setError("");
       setLoading(true);
 
       const response = await api.post(
-        `screenings/${sessionId}/upload-resumes/`,
+        `screenings/${sessionId}/api/upload-resumes/`,
         formData
       );
 
