@@ -1,7 +1,9 @@
-import axios from "axios";
+import axios from 'axios';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://resume-screening-ai-production-0d77.up.railway.app';
 
 const api = axios.create({
-    baseURL: "http://localhost:8000/api/",
+  baseURL: API_BASE_URL,
 });
 
 export default api;
